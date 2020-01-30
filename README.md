@@ -10,8 +10,9 @@ Data can be found in csv or rd format in the folder **Data**
 
 # Script directory and description:
 
-Sub-bleaching thermal stress experiment: SB TS 
-Bleaching thermal stress experiment: B TS
+Sub-bleaching thermal stress experiment: **SB TS** 
+
+Bleaching thermal stress experiment: **B TS**
 
 Script name | description
 ------------ | -------------
