@@ -2,7 +2,7 @@
 # 00_Temperature_data_SB_TS 
 # -------------------------
 
-# A script for analysis of temperature data for the sub-bleaching thermal stress experiment:
+# A script for analysis of temperature data for the bleaching thermal stress experiment:
 
 #   a) Read in rda files for each tank
 #   b) Calculate averages 
@@ -22,9 +22,8 @@ library(tidyr)
 # --------------------------------------------------------------------------------------------------------------------
 
 # .rda file format allows the user to save the data as a dataframe - specifically in this case with the date in POSIXct format. 
-# N.b Protective refurs to PS SB trajectory (pre-stress single bleaching)
-# N.b Single refurs to SB trajectory (single bleaching)
-
+# Protective = PS SB 
+# Single = SB
 # Code is repeated for each temperature treatment. 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -332,12 +331,12 @@ aggdata3$totalDHW <- cumsum(aggdata3$DHW)
 
 # Add a variable that is Day 
 
-
 aggdata1 <- mutate(aggdata1, Day = c(1:26))
 aggdata2 <- mutate(aggdata2, Day = c(1:26))
 aggdata3 <- mutate(aggdata3, Day = c(1:26))
 
-library(ggplot2)
+# Create a master plot of DHW data 
+
 ggplot() +
   geom_line(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
   geom_line(data = aggdata2, aes(x =Day, y = totalDHW, colour = "Protective")) +
