@@ -34,8 +34,10 @@ library(tidyr)
 
 load(file = "Data/SB_TS_Control_Tank_1.rda")
 load(file = "Data/SB_TS_Control_Tank_2.rda")
+
 load(file = "Data/SB_TS_Protective_Tank_1.rda")
 load(file = "Data/SB_TS_Protective_Tank_2.rda")
+
 load(file = "Data/SB_TS_Single_Tank_1.rda")
 load(file = "Data/SB_TS_Single_Tank_2.rda")
 
