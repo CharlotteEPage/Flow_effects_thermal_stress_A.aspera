@@ -24,6 +24,30 @@ library(foreign)
 library(reshape2)
 library(pbkrtest)
 
+# This script downloads all light curve data files, plots graphs, extracts points needed for analysis 
+# and does the analysis. 
+
+# 1 a. Download light curve data 
+
+# ---------------------------
+# Light Curve data analysis 
+# ---------------------------
+
+# Days of interests for this experiment are 
+# a) Day 6 - 9/03/2019
+# b) Day 12 - 15/03/2019
+# c) Day 15 - 18/03/2019
+# a) Day 16 - 19/03/2019
+# b) Day 17 - 20/03/2019
+# c) Day 18 - 21/03/2019
+# c) Day 19 - 22/03/2019
+# c) Day 20 - 23/03/2019
+
+# Analysis is conducted on points 1, 15 and 27. 
+# 1 - Dark adapted yield 
+# 15 - After light stress 
+# 27 - Recovery after light stress
+
 # --------------------------------------------------------------------------------------------------------------------
 
 #   a) Read in rda files 

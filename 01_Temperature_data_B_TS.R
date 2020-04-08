@@ -224,10 +224,8 @@ str(aggdata2)
 aggdata1$totalDHD <- cumsum(aggdata1$DHD)
 aggdata1$totalDHW <- cumsum(aggdata1$DHW)
 
-
 aggdata2$totalDHD <- cumsum(aggdata2$DHD)
 aggdata2$totalDHW <- cumsum(aggdata2$DHW)
-
 
 # Add a variable that is Day 
 

@@ -8,6 +8,7 @@
 #   b) Calculate averages 
 #   c) Plot data 
 #   d) GLMM mixed effects model 
+#   e) Sequential Bonferoni post hoc test
 
 # Load required packages 
 
@@ -23,6 +24,7 @@ library(lattice)
 library(foreign)
 library(reshape2)
 library(pbkrtest)
+library(olsrr)
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -84,11 +86,49 @@ ggplot(dy_ave, aes(x= Day, y= Yield_ave, group = Treat)) +
 
 # --------------------------------------------------------------------------------------------------------------------
 
-# Check assumptions of the model 
+str(PAM_data)
 
+# Make sure that day is specified as a factor 
+PAM_data$Day <- as.factor(PAM_data$Day)
+
+# Check for normality in data
+hist(PAM_data$Yield)
 
 # Run a model 
-Model_1 <- lmer(Yield ~ Treatment*Flow*Day + Tank.. + (1|Flow/Treatment/Tank..), data = AP)
+Model_1 <- lmer(Yield ~ Trajectory*Flow*Day + Tank.. + (1|Flow/Trajectory/Tank..), data = PAM_data)
+
+summary(Model_1)
+plot(Model_1)
+
+hist(resid(Model_1))
+# Residuals vs fitted
+plot(Model_1)
+# Normality of residuals 
+qqnorm(resid(Model_1))
+qqline(resid(Model_1))
+
+anova(Model_1)
+
+# Find no significant effect of main effect Tank, so we can just include this within the random
+# portion of the model 
+
+Model_2 <- lmer(Yield ~ Trajectory*Flow*Day + (1|Flow/Trajectory/Tank..), data = PAM_data)
+
+summary(Model_2)
+plot(Model_2)
+
+hist(resid(Model_2))
+# Residuals vs fitted
+plot(Model_2)
+# Normality of residuals 
+qqnorm(resid(Model_2))
+qqline(resid(Model_2))
+
+anova(Model_2)
+
+
+
+
 
 lsmeansobject <- lsmeans(Model_5, pairwise ~ Treatment * Flow | Day, adjust = "tukey")
 lsmeansobject

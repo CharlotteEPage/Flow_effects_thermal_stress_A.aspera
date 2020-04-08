@@ -81,7 +81,7 @@ ggplot(CT2_ave, aes(date, Temp)) +
   scale_y_continuous(name = "Temperature", limits = c(24,27))+
   theme_classic()
 
-# Filter the data for out dates of interest for tank 1 and 2
+# Filter the data for dates of interest for tank 1 and 2
 CT1_ave <- CT1_ave %>% 
   filter( date > ymd_hms("2018-04-11 01:00:00")) %>%
   filter( date < ymd_hms("2018-05-06 01:00:00"))
