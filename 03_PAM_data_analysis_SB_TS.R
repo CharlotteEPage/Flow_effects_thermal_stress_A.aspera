@@ -36,13 +36,18 @@ library(olsrr)
 load(file = "Data/SB_TS_PAM_data.rda")
 str(PAM_data)
 
+"PAM_data_SB_TS_1.csv"
+
+load(file = "Data/PAM_data_SB_TS_1.rda")
+PAM_data_1 <- PAM_data
+
 # --------------------------------------------------------------------------------------------------------------------
 
 #   b) Calculate averages 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-# Group the data by day, trajectry and flow)
+# Group the data by day, trajectry and flow
 dy_ave <- group_by(PAM_data, Day, Trajectory, Flow)
 
 # Calculate yield and standard deviation
@@ -94,23 +99,19 @@ PAM_data$Day <- as.factor(PAM_data$Day)
 # Check for normality in data
 hist(PAM_data$Yield)
 
-# Run a model 
-Model_1 <- lmer(Yield ~ Trajectory*Flow*Day + Tank.. + (1|Flow/Trajectory/Tank..), data = PAM_data)
+# Find no significant effect of main effect Tank, so we can just include this within the random
+# portion of the model 
+
+# Make a treatment factor so that coral and tank can be nested within 
+
+Model_1 <- lmer (Yield ~ Day * Trajectory * Flow + (1|Coral/Tank../Trajectory), data = PAM_data)
 
 summary(Model_1)
-plot(Model_1)
-
+anova(Model_1, type = "I")
 hist(resid(Model_1))
-# Residuals vs fitted
-plot(Model_1)
-# Normality of residuals 
 qqnorm(resid(Model_1))
 qqline(resid(Model_1))
 
-anova(Model_1)
-
-# Find no significant effect of main effect Tank, so we can just include this within the random
-# portion of the model 
 
 Model_2 <- lmer(Yield ~ Trajectory*Flow*Day + (1|Flow/Trajectory/Tank..), data = PAM_data)
 
@@ -150,8 +151,6 @@ library(multcomp)
 library(foreign)
 
 pairwise <- summary(glht(Model_6, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
-
-
 
 
 # increase max print option 
