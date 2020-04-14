@@ -25,6 +25,9 @@ library(foreign)
 library(reshape2)
 library(pbkrtest)
 library(olsrr)
+library(emmeans)
+library(multcomp)
+
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -76,7 +79,7 @@ ggplot(dy_ave, aes(x= Day, y= Yield_ave, group = Treat)) +
   geom_errorbar(aes(ymin = Yield_ave - Yield_err, ymax = Yield_ave + Yield_err), width = 0.2) +
   scale_y_continuous(name = "Quantum Yield (Fv/Fm)", limits = c(0.3,0.7), breaks = seq(0.3,0.7,0.05)) +
   scale_x_continuous(name = "Day", breaks = seq(0,22,1)) +
-  geom_line(aes(color = Treat), size =0.8) +
+  geom_line(aes(color = Treat)) +
   geom_point(aes(color = Treat)) +
   theme_classic() +
   scale_color_manual(legend_title, values= group.colors) +
@@ -104,61 +107,32 @@ hist(PAM_data$Yield)
 
 # Make a treatment factor so that coral and tank can be nested within 
 
-Model_1 <- lmer (Yield ~ Day * Trajectory * Flow + (1|Coral/Tank../Trajectory), data = PAM_data)
+Model_1 <- lmer (Yield ~ Day * Trajectory * Flow + (1|Tank../Coral), data = PAM_data)
 
 summary(Model_1)
 anova(Model_1, type = "I")
 hist(resid(Model_1))
 qqnorm(resid(Model_1))
 qqline(resid(Model_1))
+plot(Model_1)
 
+# Bonferroni post hoc test
 
-Model_2 <- lmer(Yield ~ Trajectory*Flow*Day + (1|Flow/Trajectory/Tank..), data = PAM_data)
+PAM_data$DT <- interaction(PAM_data$Day, PAM_data$Treatment, PAM_data$Flow)
 
-summary(Model_2)
-plot(Model_2)
-
-hist(resid(Model_2))
-# Residuals vs fitted
-plot(Model_2)
-# Normality of residuals 
-qqnorm(resid(Model_2))
-qqline(resid(Model_2))
-
-anova(Model_2)
-
-
-
-
-
-lsmeansobject <- lsmeans(Model_5, pairwise ~ Treatment * Flow | Day, adjust = "tukey")
-lsmeansobject
-
-library(lattice)
-xyplot(resid(Model_4)~fitted(Model_4), type = c("p","smooth"))
-
-# Bonferroni post hoc now 
-
-dy_1$DT <- interaction(dy_1$Day, dy_1$Treatment, dy_1$Flow)
-
-
-Model_6 <- lmer (value ~ 1 + DT + (1|Flow/Treatment/Tank), data = dy_1)
+Model_2 <- lmer (Yield ~ 1 + DT + (1|Tank../Coral), data = PAM_data)
 
 summary(dy_1)
 
-
-library(multcomp)
-library(foreign)
-
-pairwise <- summary(glht(Model_6, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
+pairwise <- summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
 
 
 # increase max print option 
 options(max.print = 1000000000)
 
 # Start writing to an output file
-sink("AcroFvFmpairwise")
-summary(glht(Model_6, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
+sink("AcroFvFmpairwise_SB_TS")
+summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
 # Stop writing to the file
 sink()
 
