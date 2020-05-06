@@ -261,13 +261,27 @@ ggplot() +
   geom_line(data = timeaveSI, aes(x =Timepoint, y = daily_mean, colour = "SB")) +
   scale_x_datetime(limits = c(as.POSIXct("2018-04-11 00:00:00"), as.POSIXct("2018-05-06 00:00:00")), name = "Date")+
   scale_y_continuous(breaks = seq(24,35,1), name = "Temperature (°C)") +
-  scale_colour_manual(name = "Treatment", values = c ("dodgerblue4", "seagreen", "firebrick4"), labels = c("Ambient", "PS SB","SB")) +
+  scale_colour_manual(name = "Treatment", values = c ("dodgerblue4", "#A79C93", "firebrick4"), labels = c("Ambient", "PS SB","SB")) +
   theme_classic() +
   theme(axis.text.x = element_text(size = "11"),
         axis.text.y = element_text(size = "11"),
         axis.title.x = element_text(size = "11"),
         axis.title.y = element_text(size = "11"))
 
+
+
+ggplot() +
+  geom_line(data = timeaveCT, aes(x =Timepoint, y = daily_mean, colour = "Ambient"), size = 0.4) +
+  geom_line(data = timeavePR, aes(x =Timepoint, y = daily_mean, colour = "PS SB"), size = 0.4) +
+  geom_line(data = timeaveSI, aes(x =Timepoint, y = daily_mean, colour = "SB"), size = 0.4) +
+  scale_x_datetime(limits = c(as.POSIXct("2018-04-11 00:00:00"), as.POSIXct("2018-05-06 00:00:00")), name = "Date")+
+  scale_y_continuous(breaks = seq(24,35,1), name = "Temperature (°C)") +
+  scale_colour_manual(name = "Treatment", values = c ("dodgerblue4", "gray8", "firebrick4"), labels = c("Ambient", "PS SB","SB")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = "15"),
+        axis.text.y = element_text(size = "15"),
+        axis.title.x = element_text(size = "15"),
+        axis.title.y = element_text(size = "15"))
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -347,7 +361,7 @@ ggplot() +
   geom_point(data = aggdata2, aes(x =Day, y = totalDHW, colour = "Protective")) +
   geom_point(data = aggdata3, aes(x =Day, y = totalDHW, colour = "Single")) +
   scale_x_continuous(breaks = seq(0,26,1), name = "Day")+
-  scale_y_continuous(breaks = seq(0,4,0.5), name = "Total Degree Heating Weeks")+
+  scale_y_continuous(breaks = seq(0,5,0.5), ylim = c(0,5), name = "eDHWs", position = "right")+
   scale_colour_manual(name = "Treatment", values = c ("dodgerblue4", "seagreen", "indianred4"), labels = c("Ambient", "Protective","Single")) +
   theme_classic() +
   theme(axis.text.x = element_text(size = "10"),
@@ -356,9 +370,38 @@ ggplot() +
         axis.title.y = element_text(size = "10"))
 
 
+ggplot() +
+  geom_line(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
+  geom_line(data = aggdata2, aes(x =Day, y = totalDHW, colour = "Protective")) +
+  geom_line(data = aggdata3, aes(x =Day, y = totalDHW, colour = "Single")) +
+  geom_point(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
+  geom_point(data = aggdata2, aes(x =Day, y = totalDHW, colour = "Protective")) +
+  geom_point(data = aggdata3, aes(x =Day, y = totalDHW, colour = "Single")) +
+  scale_x_continuous(breaks = seq(0,26,1), name = "Day")+
+  scale_y_continuous(limits = c(0,5), name = "eDHWs", position = "right")+
+  scale_colour_manual(name = "Treatment", values = c ("gray8", "lightseagreen", "magenta4"), labels = c("Ambient", "Protective","Single")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = "10"),
+        axis.text.y = element_text(size = "10"),
+        axis.title.x = element_text(size = "10"),
+        axis.title.y = element_text(size = "10"))
 
 
-
+ggplot() +
+  #geom_line(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient", linetype = "dotted")) +
+  geom_line(data = aggdata2, aes(x =Day, y = totalDHW, linetype = "dashed"), size = 0.2)+
+  geom_line(data = aggdata3, aes(x =Day, y = totalDHW, linetype = "dash"), size = 0.2) +
+  #geom_point(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
+  geom_point(data = aggdata2, aes(x =Day, y = totalDHW)) +
+  geom_point(data = aggdata3, aes(x =Day, y = totalDHW)) +
+  scale_x_continuous(limits = c(1,24), breaks = seq(0,24,1), name = "Day")+
+  scale_y_continuous(limits = c(0,5), breaks = seq(0,5,0.5),name = "eDHW", position = "right")+
+ # scale_colour_manual(name = "Treatment",values = c("#4B878BFF","#D01C1FFF"),labels = c("Protective","Single")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = "15"),
+        axis.text.y = element_text(size = "15"),
+        axis.title.x = element_text(size = "15"),
+        axis.title.y = element_text(size = "15"))
 
 
 

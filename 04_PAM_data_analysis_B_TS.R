@@ -37,7 +37,6 @@ library(foreign)
 # and does the analysis. 
 
 
-
 # --------------------------------------------------------------------------------------------------------------------
 
 #   a) Read in rda files 
@@ -221,17 +220,38 @@ PAM_data_1 <- rbind(PAM_AMB,PAM_HT)
 PAM_data_1$Tank_1 <- as.factor(PAM_data_1$Tank_1)
 str(PAM_data_1)
 
-Model_1<- lmer(average_yield ~ Treatment*Flow*Day + (1|Tank_1/Coral), data = PAM_data_1, REML = FALSE)
+# Look at the distribution of the data
+hist(PAM_data_1$average_yield, breaks = 100)
+# The data seems to be negatively skewed. transform data
+
+PAM_data_2 <- mutate(PAM_data_1, new = average_yield^(1/3))
+hist(PAM_data_2$new, breaks = 100)
+
+
+library("fitdistrplus")
+descdist(PAM_data_1$average_yield, discrete = F, boot = 1000)
+
+# Boundary is singular fit 
+library(blme)
+
+
+str(PAM_data_1)
+PAM_data_1$Day <- as.factor(PAM_data_1$Day)
+
+Model_1<- lmer(average_yield ~ Treatment*Flow*Day + (1|Tank/Coral), data = PAM_data_1, REML = FALSE)
+Model_2 <- blmer(average_yield ~ Treatment*Flow*Day + (1|Tank/Coral), data = PAM_data_1, REML = FALSE)
+
 summary(Model_1)
+anova(Model_1, type = "I")
 
-Model_2<- lm(average_yield ~ Treatment*Flow*Day, data = PAM_data)
-
-anova(Model_1,Model_2)
+ summary(Model_2)
+anova(Model_2)
 
 # Probably due to low sample numbers (and variable levels)
 # Still seems to be singular - instead we will try  Bayesian
 # framework using Markov chain Monte Carlo (MCMC) methods in the R package MCMCglmm
 
+Model_1<- blmer(average_yield ~ Treatment*Flow*Day + (1|Coral), data = PAM_data_1, REML = FALSE)
 
 
 summary(Model_1)

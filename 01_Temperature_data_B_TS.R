@@ -178,6 +178,43 @@ ggplot(timeaveBT, aes(Timepoint,daily_mean)) +
   scale_y_continuous(name = "Temperature")+
   theme_classic()
 
+# --------------------------------------------------------------------------------------------------------------------
+
+#   c) Plot data 
+
+# --------------------------------------------------------------------------------------------------------------------
+
+
+ggplot() +
+  geom_line(data = timeaveBT, aes(x =Timepoint, y = daily_mean, colour = "Ambient"), size = 0.4) +
+  geom_line(data = timeaveCT, aes(x =Timepoint, y = daily_mean, colour = "PS SB"), size = 0.4) +
+  scale_x_datetime(limits = c(as.POSIXct("2019-03-04 00:00:00"), as.POSIXct("2019-03-23 00:00:00")), name = "Date")+
+  scale_y_continuous(breaks = seq(24,35,1), name = "Temperature (°C)") +
+  scale_colour_manual(name = "Treatment", values = c ("dodgerblue4", "firebrick4"), labels = c("Ambient", "PS SB","SB")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = "15"),
+        axis.text.y = element_text(size = "15"),
+        axis.title.x = element_text(size = "15"),
+        axis.title.y = element_text(size = "15"))
+
+
+#ff5e6c
+
+ggplot() +
+  geom_line(data = timeaveCT, aes(x =Timepoint, y = daily_mean, colour = "Ambient"), size = 0.4) +
+  geom_line(data = timeavePR, aes(x =Timepoint, y = daily_mean, colour = "PS SB"), size = 0.4) +
+  geom_line(data = timeaveSI, aes(x =Timepoint, y = daily_mean, colour = "SB"), size = 0.4) +
+  scale_x_datetime(limits = c(as.POSIXct("2018-04-11 00:00:00"), as.POSIXct("2018-05-06 00:00:00")), name = "Date")+
+  scale_y_continuous(breaks = seq(24,35,1), name = "Temperature (°C)") +
+  scale_colour_manual(name = "Treatment", values = c ("#0294A5", "#A79C93", "#C1403D"), labels = c("Ambient", "PS SB","SB")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = "15"),
+        axis.text.y = element_text(size = "15"),
+        axis.title.x = element_text(size = "15"),
+        axis.title.y = element_text(size = "15"))
+
+
+
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -249,6 +286,19 @@ ggplot() +
         axis.title.y = element_text(size = "10"))
 
 
+ggplot() +
+  #geom_line(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
+  geom_line(data = aggdata2, aes(x =Day, y = totalDHW), size = 0.2) +
+  #geom_point(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
+  geom_point(data = aggdata2, aes(x =Day, y = totalDHW)) +
+  scale_x_continuous(limits = c(0,20),breaks = seq(0,20,1), name = "Day")+
+  scale_y_continuous(limits = c(0,5), breaks = seq(0,5,0.5), name = "eDHW", position = "right")+
+  #scale_colour_manual(name = "Treatment", values = c ("dodgerblue4", "indianred4"), labels = c("Ambient", "Bleaching")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = "15"),
+        axis.text.y = element_text(size = "15"),
+        axis.title.x = element_text(size = "15"),
+        axis.title.y = element_text(size = "15"))
 
 
 

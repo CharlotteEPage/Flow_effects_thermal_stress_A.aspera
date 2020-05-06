@@ -12,7 +12,7 @@
 
 # a. Load counts and surface area data into R 
 # b. Calculate the mean number of zoox counted for each chamber
-# c. Multiple of the mean obtained by 10,000 to obtain the number of cells per ml of diluted sample
+# c. Multiply the mean obtained by 250 * 1000 to obtain the number of cells per cm^-2 of diluted sample
 # d. Then divide by the surface area of the fragment. 
 # e. Plot this data as boxplots with error bars 
 # f. Conduct statistical analysis to look for statistical differences 
@@ -70,13 +70,19 @@ str(counts_ave)
 
 # --------------------------------------------------------------------------------------------------------------------
 
-#   c) Multiply the mean obtained by 10,000 to obtain the number of cells per ml of diluted sample
+#   c) Multiply the mean obtained by 250 and then convert from ml^-2 to cm^-2
 
 # --------------------------------------------------------------------------------------------------------------------
 
-# Make a new column with counts x 10,0000
+# * 250(mean per little square) * dilution * 1000 (ml2 to cm2)
 
-counts_ave <- mutate(counts_ave, per_ml = ave_sample * 10000)
+# Make a new column with counts 250
+
+counts_ave <- mutate(counts_ave, per_ml = ave_sample * 250)
+
+# Make a new column with counts x 1000 (ml2 to cm2)
+
+counts_ave <- mutate(counts_ave, per_cm = per_ml*1000)
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -97,7 +103,7 @@ str(full)
 
 full$SA <- full$S.A...cm2..est.
 
-density <- mutate(full, density = per_ml/SA)
+density <- mutate(full, density = per_cm/SA)
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -118,16 +124,15 @@ ggplot(final2, aes(x = Treat, y = density)) +
   geom_boxplot()
 
 
-final2 <- mutate (final2, adjusted = density/100000)
+final2 <- mutate (final2, adjusted = density/1000000)
 
 ggplot(final2, aes(x = Treat, y = adjusted)) +
   geom_boxplot()
 
 # Coloured plot
 ggplot(final2, aes(x = Treat, y = adjusted, group = Treat)) +
-  geom_boxplot(fill =  c("deepskyblue4","deepskyblue3","green4", "green", "firebrick4", "indianred3","deepskyblue4","deepskyblue3","green4", "green", "firebrick4", "indianred3")) +
+  geom_boxplot(col =  c("deepskyblue4","deepskyblue3","gray35", "gray55", "firebrick4", "indianred3","deepskyblue4","deepskyblue3","gray35", "gray55", "firebrick4", "indianred3")) +
   theme_classic()  
-
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -149,15 +154,19 @@ final$Timepoint <- as.factor(final$Timepoint)
 final$Treatment <- as.factor(final$Treatment)
 final$Flow <- as.factor(final$Flow)
 final$Tank <- as.factor(final$Tank)
+final$Coral <- as.factor(final$Coral)
 
-mod1 <- lmer(density ~ Timepoint * Treatment * Flow + (1|Tank/Coral), data = final)
+mod1 <- lmer(density ~ Timepoint * Treatment * Flow + (1|Tank), data = final, REML = FALSE)
 
 summary(mod1)
 plot(mod1)
 hist(resid(mod1), breaks = 10)
 qqnorm(resid(mod1))
 qqline(resid(mod1))
-anova(mod1, type = "I")
+a <- anova(mod1, type = "I")
+a
+write.csv(as.matrix(a), file = "Endo_anova.csv", na = "")
+
 
 coefficients(mod1)
 
@@ -168,6 +177,15 @@ summary(Mod)
 pairwise <- summary(glht(Mod, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
 
 pairwise
+
+# Boundary is singular fit 
+library(blme)
+install.packages("blme")
+
+str(final)
+
+Mod_2 <- lmer(density ~ Timepoint * Treatment * Flow + (1|Tank), data = final, REML = TRUE)
+anova(Mod_2)
 
 
 
