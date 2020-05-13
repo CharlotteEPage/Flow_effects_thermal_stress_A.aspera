@@ -1,3 +1,6 @@
+
+
+
 # Flow_effects_thermal_stress_A.aspera
 
 Data and code for manuscript in prep.
