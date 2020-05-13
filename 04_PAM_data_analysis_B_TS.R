@@ -125,7 +125,7 @@ head(PAM_IR_data_sum)
 # ---------------------------
 
 # Join columns 
-PAM_data_sum <- unite(data = PAM_data_sum, col = "Treat", c(2,3))
+#PAM_data_sum <- unite(data = PAM_data_sum, col = "Treat", c(2,3))
 
 # Assign colours
 group.colors <- c("deepskyblue4","deepskyblue3","firebrick4", "indianred3")
@@ -176,7 +176,7 @@ legend_title <- "Treatment"
 
 ggplot(PAM_final_points , aes(x= Day, y= Yield_ave, group = Treat)) + 
   geom_errorbar(aes(ymin = Yield_ave - Yield_err, ymax = Yield_ave + Yield_err), width=.1) +
-  scale_y_continuous(name = "Yield", limits = c(0.1,0.7), breaks = seq(0.1,0.7,0.1)) +
+  scale_y_continuous(name = "Yield", limits = c(0.0,0.7), breaks = seq(0.1,0.7,0.1)) +
   geom_line(aes(color = Treat)) +
   geom_point(aes(color = Treat)) +
   theme_classic() +
@@ -195,56 +195,115 @@ ggplot(PAM_final_points , aes(x= Day, y= Yield_ave, group = Treat)) +
 PAM_data
 
 str(PAM_data)
-PAM_data$Flow <- as.factor(PAM_data$Flow)
 
-# Model is singular 
-# Try recoding tank levels
+PAM_data$Flow <- as.factor(PAM_data$Flow)
+PAM_data$Day <- as.factor(PAM_data$Day)
+
+str(PAM_data_sum)
+
+Model_1<- lmer (average_yield ~ Treatment*Flow*Day + (1|Tank/Coral), data = PAM_data, REML = FALSE)
+
+summary(Model_1)
+d <- anova(Model_1, type = "I")
+write.csv(as.matrix(d), file = "Exp1_PAM_fvfm_anova.csv", na = "")
+
+d
+
+# Look at model 
+summary(Model_1)
+plot(Model_1)
+hist(resid(Model_1), breaks = 100)
+qqnorm(resid(Model_1))
+qqline(resid(Model_1))
+anova(Model_1, type = "I")
+
+
+xyplot(resid(Model_1)~fitted(Model_1), type = c("p","smooth"))
+
+# Bonferroni post hoc - pairwise comparisons
+
+PAM_data$DT <- interaction(PAM_data$Day, PAM_data$Treatment, PAM_data$Flow)
 
 str(PAM_data)
 
-PAM_HT <- filter(PAM_data, Treatment == "HT") %>% 
+Model_2<- lmer(average_yield ~ 1 + DT + (1|Flow/Treatment/Tank), data = PAM_data)
+
+AIC(Model_1)
+AIC(Model_2)
+
+pairwise <- summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
+
+pairwise
+
+# increase max print option 
+options(max.print = 1000000000)
+
+# Start writing to an output file
+sink("AcroFvFmpairwise")
+summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
+# Stop writing to the file
+sink()
+
+
+
+
+
+
+
+
+# Below is a load of exploration for running different models (e.g. transforming and recoding data, exploring options of running a binomial model)
+# Model is singular 
+# Try recoding tank levels
+
+#str(PAM_data)
+
+#PAM_HT <- filter(PAM_data, Treatment == "HT") %>% 
   mutate(Tank = fct_recode(Tank, "1" = "3"))
 
-library(plyr)
-PAM_HT <- mutate(PAM_HT, Tank_1 = revalue(Tank, c("1" = "3", "2" = "4")))
+#library(plyr)
+#PAM_HT <- mutate(PAM_HT, Tank_1 = revalue(Tank, c("1" = "3", "2" = "4")))
 
-PAM_AMB <- filter(PAM_data, Treatment == "AMB")
-PAM_AMB <- mutate(PAM_AMB, Tank_1 = revalue(Tank, c("1" = "1", "2" = "2")))
+#PAM_AMB <- filter(PAM_data, Treatment == "AMB")
+#PAM_AMB <- mutate(PAM_AMB, Tank_1 = revalue(Tank, c("1" = "1", "2" = "2")))
 
 # Bind PAM_HT and PAM_AMB together 
 
-PAM_data_1 <- rbind(PAM_AMB,PAM_HT)
+#PAM_data_1 <- rbind(PAM_AMB,PAM_HT)
 
 # Make tank a factor 
 
-PAM_data_1$Tank_1 <- as.factor(PAM_data_1$Tank_1)
-str(PAM_data_1)
+#PAM_data_1$Tank_1 <- as.factor(PAM_data_1$Tank_1)
+#str(PAM_data_1)
 
 # Look at the distribution of the data
-hist(PAM_data_1$average_yield, breaks = 100)
+#hist(PAM_data_1$average_yield, breaks = 100)
 # The data seems to be negatively skewed. transform data
 
-PAM_data_2 <- mutate(PAM_data_1, new = average_yield^(1/3))
-hist(PAM_data_2$new, breaks = 100)
+#PAM_data_2 <- mutate(PAM_data_1, new = average_yield^(1/3))
+#hist(PAM_data_2$new, breaks = 100)
 
 
-library("fitdistrplus")
-descdist(PAM_data_1$average_yield, discrete = F, boot = 1000)
+#library("fitdistrplus")
+#descdist(PAM_data_1$average_yield, discrete = F, boot = 1000)
 
-# Boundary is singular fit 
-library(blme)
+
+
 
 
 str(PAM_data_1)
 PAM_data_1$Day <- as.factor(PAM_data_1$Day)
-
-Model_1<- lmer(average_yield ~ Treatment*Flow*Day + (1|Tank/Coral), data = PAM_data_1, REML = FALSE)
-Model_2 <- blmer(average_yield ~ Treatment*Flow*Day + (1|Tank/Coral), data = PAM_data_1, REML = FALSE)
+Model_1<- lmer(Yield ~ Treatment*Flow*Day + (1|Tank../Coral), data = PAM_data_1, REML = FALSE)
 
 summary(Model_1)
-anova(Model_1, type = "I")
+d <- anova(Model_1, type = "I")
+write.csv(as.matrix(d), file = "Exp1_PAM_fvfm_anova.csv", na = "")
 
- summary(Model_2)
+
+
+
+
+
+summary(Model_2)
 anova(Model_2)
 
 # Probably due to low sample numbers (and variable levels)
@@ -308,7 +367,6 @@ qqline(resid(mod_2))
 anova(mod_2, type = "I")
 
 
-
 hist(resid(mod_2),breaks=100,density=T)
 plot(density(resid(mod_2)))
 summary(mod_2)
@@ -345,7 +403,7 @@ coefficients(Model_3)
 
 IR_PAM_data$DT <- interaction(IR_PAM_data$Treat , IR_PAM_data$Flow)
 
-Mod <- lmer (yield ~ 1 + DT + (1|Tank/Treat/Flow), data = IR_PAM_data)
+Mod <- lmer (yield ~ 1 + DT + (1|Tank/Coral), data = IR_PAM_data)
 summary(Mod)
 pairwise <- summary(glht(Mod, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
 

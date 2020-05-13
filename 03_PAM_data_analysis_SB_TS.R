@@ -96,7 +96,7 @@ group.colors <- c("deepskyblue4","deepskyblue3","gray35", "gray55", "firebrick4"
 legend_title <- "Treatment"
 str(dy_ave)
 ggplot(dy_ave, aes(x= Day, y= Yield_ave, group = Treat)) + 
-  geom_errorbar(aes(ymin = Yield_ave - Yield_err, ymax = Yield_ave + Yield_err), width = 0.1) +
+  geom_errorbar(aes(ymin = Yield_ave - Yield_err, ymax = Yield_ave + Yield_err), width = 0.2) +
   scale_y_continuous(name = "Quantum Yield (Fv/Fm)", limits = c(0.3,0.7), breaks = seq(0.3,0.7,0.05)) +
   scale_x_continuous(name = "Day", limits = c(0,24), breaks = seq(0,24,1)) +
   geom_line(aes(color = Treat)) +
