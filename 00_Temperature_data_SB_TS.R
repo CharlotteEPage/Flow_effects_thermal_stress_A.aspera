@@ -389,8 +389,8 @@ ggplot() +
 
 ggplot() +
   #geom_line(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient", linetype = "dotted")) +
-  geom_line(data = aggdata2, aes(x =Day, y = totalDHW, linetype = "dashed"), size = 0.2)+
-  geom_line(data = aggdata3, aes(x =Day, y = totalDHW, linetype = "dash"), size = 0.2) +
+  geom_line(data = aggdata2, aes(x =Day, y = totalDHW), size = 0.2)+
+  geom_line(data = aggdata3, aes(x =Day, y = totalDHW), size = 0.2) +
   #geom_point(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
   geom_point(data = aggdata2, aes(x =Day, y = totalDHW)) +
   geom_point(data = aggdata3, aes(x =Day, y = totalDHW)) +
