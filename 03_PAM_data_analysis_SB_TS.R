@@ -142,7 +142,20 @@ PAM_data$DT <- interaction(PAM_data$Day, PAM_data$Treatment, PAM_data$Flow)
 
 Model_2 <- lmer (Yield ~ 1 + DT + (1|Tank../Coral), data = PAM_data)
 
-str(PAM_data)
+pairwise <- summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
+
+
+# increase max print option 
+options(max.print = 1000000000)
+
+# Start writing to an output file
+sink("AcroFvFmpairwise_SB_TS.txt")
+summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
+# Stop writing to the file
+sink()
+
+
+
 
 # Betareg 
 Model_3 <- betareg(Yield ~ Day * Trajectory * Flow + (1|Coral), data = PAM_data, link="logit")
@@ -185,6 +198,8 @@ sink("AcroFvFmpairwise_SB_TS")
 summary(glht(Model_2, linfct = mcp (DT = "Tukey")),test = adjusted("bonferroni"))
 # Stop writing to the file
 sink()
+
+
 
 
 

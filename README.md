@@ -1,11 +1,9 @@
 
-
-
 # Flow_effects_thermal_stress_A.aspera
 
 Data and code for manuscript in prep.
 
-High flow conditions mediate the damaging effects of thermal stress on *Acropora aspera*. Implications for local reef conservation in a changing world. 
+High flow conditions can mediate the damaging effects of thermal stress and bleaching on the endosymbiosis in *Acropora aspera*
 
 [link to paper!](http://google.com)
 

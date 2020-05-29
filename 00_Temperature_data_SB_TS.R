@@ -389,12 +389,12 @@ ggplot() +
 
 ggplot() +
   #geom_line(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient", linetype = "dotted")) +
-  geom_line(data = aggdata2, aes(x =Day, y = totalDHW), size = 0.2)+
-  geom_line(data = aggdata3, aes(x =Day, y = totalDHW), size = 0.2) +
+  geom_line(data = aggdata2, aes(x =Day, y = totalDHW), size = 0.2, colour = "indianred4")+
+  geom_line(data = aggdata3, aes(x =Day, y = totalDHW), size = 0.2, colour = "indianred4") +
   #geom_point(data = aggdata1, aes(x =Day, y = totalDHW, colour = "Ambient")) +
-  geom_point(data = aggdata2, aes(x =Day, y = totalDHW)) +
-  geom_point(data = aggdata3, aes(x =Day, y = totalDHW)) +
-  scale_x_continuous(limits = c(1,24), breaks = seq(0,24,1), name = "Day")+
+  geom_point(data = aggdata2, aes(x =Day, y = totalDHW, colour = "indianred4")) +
+  geom_point(data = aggdata3, aes(x =Day, y = totalDHW, colour = "indianred4")) +
+  scale_x_continuous(limits = c(3,26), breaks = seq(0,26,1), name = "Day")+
   scale_y_continuous(limits = c(0,5), breaks = seq(0,5,0.5),name = "eDHW", position = "right")+
  # scale_colour_manual(name = "Treatment",values = c("#4B878BFF","#D01C1FFF"),labels = c("Protective","Single")) +
   theme_classic() +
@@ -402,6 +402,8 @@ ggplot() +
         axis.text.y = element_text(size = "15"),
         axis.title.x = element_text(size = "15"),
         axis.title.y = element_text(size = "15"))
+
+aggdata3
 
 
 
