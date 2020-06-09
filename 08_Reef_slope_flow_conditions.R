@@ -14,6 +14,8 @@
 # f. Two sample Kolmogorov-Smirnov test 
 # g. Granger Test 
 
+# h. Split data where neap and spring tides occur, calculate average flow velocities (and directions) for these days
+
 library(zoo)
 library(xts)
 library(Hmisc)
@@ -51,35 +53,19 @@ str(lg)
 # --------------------------------------------------------------------------------------------------------------------
 
 
-
 # --------------------------------------------------------------------------------------------------------------------
 
 # c. Plot data (wind rose)
 
 # --------------------------------------------------------------------------------------------------------------------
 
-str(lg_1)
-ggplot(lg_1, aes(dir)) + geom_histogram()
 
-# Create data subset
-brks <- c(0,  45,  90, 135, 180, 225, 270, 315, 360)
-lbs  <- c("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+# use the windRose function in the package openair 
 
-flow_1 <- lg %>%
-  #filter( is.na(dir) == FALSE, is.na(speed) == FALSE) %>%  
-  mutate(dir2 = (dir + 360/8/2)%%360) %>%
-  mutate( dirbin = cut(dir2, breaks=brks, labels=lbs) )  %>%
-  group_by(dirbin) %>%
-  summarise(dircnt =  n())
-
-ggplot(aes(x=dirbin, y=dircnt), data= flow_1) + geom_bar(width=1, stat = "identity") 
-
-windRose(lg_1, ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.1, 0.15, 0.2), width = 1.5)
-windRose(lg_2, ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.1, 0.15, 0.2), width = 1.5)
-windRose(lg_3, ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.1, 0.15, 0.2), width = 1.5)
-
-
+# All meters (displayed)
 windRose(lg, type = "Log", ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.10, 0.15, 0.20), width = 1.5)
+
+# All meters (averaged)
 windRose(lg, ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.1, 0.15, 0.2), width = 1.5)
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -131,7 +117,6 @@ ggplot() +
   theme_classic()
 
 
-
 # f. Two sample Kolmogorov-Smirnov test 
 
 # Test of time series are stationary
@@ -154,7 +139,6 @@ library(tseries)
 install.packages("tseries")
 
 kpss.test(lg_1$speed, null = c("Level"))
-
 
 kpss.test(ts_log1, null = c("Level"))
 kpss.test(ts_log2, null = c("Level"))
@@ -291,23 +275,101 @@ plot(ecdf(lg_ac$speed), do.points=FALSE, verticals=TRUE, xlim=range(lg_ac$speed,
 plot(ecdf(lg_bc$speed), do.points=FALSE, verticals=TRUE, add=TRUE, col = "gray55")kplot(ecdf(lg_ac$`lg_c$speed`), do.points=FALSE, verticals=TRUE, add=TRUE, col = "gray8")
 
 
+# h. Split data where neap and spring tides occur 
 
+# Extract data centered around moon phases 
+# Neap tide 17th-21st April 
+# Spring tide 25th-29th April 
 
+# Meter 1
 
+meter1spring <- filter(lg, Log == "1") %>% 
+  subset(datetime >= as.Date("2019-04-17")) %>% 
+  subset(datetime<= as.Date("2019-04-21"))
 
+stat.desc(meter1spring$speed)
 
+meter1neap <- filter(lg, Log == "1") %>% 
+  subset(datetime >= as.Date("2019-04-25")) %>% 
+  subset(datetime<= as.Date("2019-04-29"))
 
+stat.desc(meter1neap$speed)
 
+# Meter 2
 
+meter2spring <- filter(lg, Log == "2") %>% 
+  subset(datetime >= as.Date("2019-04-17")) %>% 
+  subset(datetime<= as.Date("2019-04-21"))
 
+stat.desc(meter2neap$speed)
 
+meter2neap <- filter(lg, Log == "2") %>% 
+  subset(datetime >= as.Date("2019-04-25")) %>% 
+  subset(datetime<= as.Date("2019-04-29"))
 
+stat.desc(meter2spring$speed)
 
+# Meter 3
 
+meter3spring <- filter(lg, Log == "3") %>% 
+  subset(datetime >= as.Date("2019-04-17")) %>% 
+  subset(datetime<= as.Date("2019-04-21"))
 
+stat.desc(meter3spring$speed)
 
+meter3neap <- filter(lg, Log == "3") %>% 
+  subset(datetime >= as.Date("2019-04-25")) %>% 
+  subset(datetime<= as.Date("2019-04-29"))
 
+stat.desc(meter3neap$speed)
 
+# Box plot for these distinct time periods 
+
+# Group these data frames together 
+
+# Spring
+
+spring1 <- rbind(meter1spring,meter2spring) 
+spring <- rbind(spring1,meter3spring)
+
+g <- group_by(spring, Log)
+
+p <- ggplot(spring, aes (x = Log, y = speed, fill = Log)) + 
+  geom_violin(trim = FALSE) + 
+  labs(title = "Plot of frequency of speeds by logger", x = "Flow meter", y = "Velocity (ms )") +
+  geom_boxplot(width = 0.1, fill = "white") + 
+  theme_classic() +
+  scale_x_discrete(limits = c("1", "2", "3")) +
+  scale_fill_brewer(palette ="Greys")
+p
+
+p + scale_color_grey() + theme_classic() + geom_boxplot(width  = 0.1) +  scale_fill_brewer(palette ="Spectral")
+
+# Neap 
+
+# Group these data frames together 
+
+neap1 <- rbind(meter1neap,meter2neap) 
+neap <- rbind(neap1,meter3neap)
+
+g <- group_by(neap, Log)
+
+p <- ggplot(neap, aes (x = Log, y = speed, fill = Log)) + 
+  geom_violin(trim = FALSE) + 
+  labs(title = "Plot of frequency of speeds by logger", x = "Flow meter", y = "Velocity (ms )") +
+  geom_boxplot(width = 0.1, fill = "white") + 
+  theme_classic() +
+  scale_x_discrete(limits = c("1", "2", "3")) +
+  scale_fill_brewer(palette ="Greys")
+p
+
+p + scale_color_grey() + theme_classic() + geom_boxplot(width  = 0.1) +  scale_fill_brewer(palette ="Spectral")
+
+# Wind rose for spring
+windRose(spring, type = "Log", ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.10, 0.15, 0.20), width = 1.5)
+
+# Wind rose for neap
+windRose(neap, type = "Log", ws = "speed", wd = "dir", breaks = c(0, 0.05, 0.10, 0.15, 0.20), width = 1.5)
 
   # Granger test for causality 
   
@@ -325,7 +387,6 @@ str(lg_3)
 lg_c <- lg_3
 
 lg_c$speed_3 <- lg_c$speed
-
 
 
 # Create a time series object in r for each meter 

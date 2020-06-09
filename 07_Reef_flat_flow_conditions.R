@@ -59,6 +59,19 @@ ggplot(sites, aes(x = site, y = VelX, group = site, color = site)) +
   xlab("Site")
 
 str(sites)
+# Make a dummt variable for plotting sake 
+sites_new <- mutate(sites, ave = "1")
+ggplot(sites_new, aes(x = ave, y = VelX))+ 
+  geom_boxplot() + 
+  scale_y_continuous(name = "Velocity (ms )", breaks = seq(0.0, 0.5,0.05)) +
+  scale_color_manual(Legend_title, values = group.colors) +
+  theme_classic() + 
+  xlab("Site")
+
+
+
+
+str(sites)
 sites_ave <- group_by(sites, St)
 
 sites_ave <- summarise(sites_ave, mean_flow = mean(VelX), sdev = sd(VelX))
